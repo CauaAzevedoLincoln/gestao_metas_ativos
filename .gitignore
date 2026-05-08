@@ -25,7 +25,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# environment variables (NUNCA comitar segredos)
+.env
+.env.local
 .env*.local
 
 # vercel
@@ -34,3 +36,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# banco de dados SQLite local (não deve ir para o repositório)
+prisma/database.sqlite
+prisma/*.db
+prisma/*.db-journal
+
+# pasta legada com .git aninhado
+gestao_metas_ativos/
