@@ -1,0 +1,22 @@
+// Prisma schema - Sistema de Gestão de Metas da Talita (Standalone)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Meta {
+  id          Int      @id @default(autoincrement())
+  analista    String
+  mesAno      String
+  semana      String
+  atividade   String
+  meta        Float
+  realizado   Float
+  status      String?
+  observacao  String?
+  dataCriacao DateTime @default(now())
+}
