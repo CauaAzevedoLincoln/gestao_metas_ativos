@@ -46,7 +46,7 @@ interface Meta {
   justificativa?: string;
   observacao?: string | null;
   dataCriacao?: string | Date;
-  status?: "Verde" | "Amarelo" | "Vermelho" | null;
+  status?: "Verde" | "Amarelo" | "Vermelho" | string | null;
 }
 
 export default function MetasTimePage() {
@@ -72,12 +72,12 @@ export default function MetasTimePage() {
   const currentStatus = calcularStatus(watchRealizado, watchMeta);
   const isJustificativaRequired = currentStatus === "Amarelo" || currentStatus === "Vermelho";
 
-  const fetchMetas = async () => {
+  const fetchMetas = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await getMetas();
       if (res.success && res.data) {
-        const loadedMetas = res.data.map((m: any) => ({
+        const loadedMetas = res.data.map((m: Meta) => ({
           ...m,
           justificativa: m.observacao || m.justificativa,
           status: calcularStatus(Number(m.realizado), Number(m.meta))
@@ -89,9 +89,9 @@ export default function MetasTimePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchMetas(); }, []);
+  useEffect(() => { fetchMetas(); }, [fetchMetas]);
 
   const onSubmit = async (data: Meta) => {
     try {

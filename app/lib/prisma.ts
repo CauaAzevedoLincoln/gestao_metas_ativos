@@ -1,17 +1,19 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
-import path from "node:path";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function buildPrismaClient() {
-  const dbPath = path.join(process.cwd(), "prisma", "database.sqlite");
-  // PrismaLibSql v7 takes a config object with url, not a client instance
-  const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new PrismaClient({ adapter: adapter as any });
+// Prisma 7: requer um driver adapter nativo JS para PostgreSQL
+function buildPrismaClient(): PrismaClient {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }, // necessário para Neon (SSL obrigatório)
+  });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter });
 }
 
 export const prisma: PrismaClient =

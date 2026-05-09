@@ -3,6 +3,17 @@
 import prisma from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+interface MetaInput {
+  analista: string;
+  mesAno: string;
+  semana: string;
+  atividade: string;
+  meta: number | string;
+  realizado: number | string;
+  status?: string | null;
+  justificativa?: string;
+}
+
 export async function getMetas() {
   try {
     const metas = await prisma.meta.findMany({
@@ -15,7 +26,7 @@ export async function getMetas() {
   }
 }
 
-export async function createMeta(data: any) {
+export async function createMeta(data: MetaInput) {
   try {
     const novaMeta = await prisma.meta.create({
       data: {
