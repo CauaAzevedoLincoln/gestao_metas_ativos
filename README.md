@@ -52,12 +52,11 @@ Acesse em: [http://localhost:3000](http://localhost:3000)
 
 ### Pré-requisito: Banco de dados em produção
 
-O SQLite **não funciona na Vercel** (filesystem somente leitura). Para produção, utilize o **[Turso](https://turso.tech)** (LibSQL gerenciado, plano gratuito disponível):
+Para produção, o projeto utiliza o **[Neon PostgreSQL](https://neon.tech)** (banco gerenciado, plano gratuito disponível):
 
-1. Crie uma conta no [Turso](https://turso.tech)
-2. Crie um banco: `turso db create gestao-metas`
-3. Obtenha a URL: `turso db show gestao-metas --url`
-4. Gere um token: `turso db tokens create gestao-metas`
+1. Crie uma conta no [Neon](https://neon.tech)
+2. Crie um novo projeto e obtenha a **Connection String**.
+3. No Neon, selecione **Connection Details** e copie a URL.
 
 ### Variáveis de ambiente na Vercel
 
@@ -65,8 +64,10 @@ No painel da Vercel → Settings → Environment Variables, adicione:
 
 | Variável | Valor |
 |---|---|
-| `DATABASE_URL` | `libsql://seu-banco.turso.io` |
-| `TURSO_AUTH_TOKEN` | `seu-token-aqui` |
+| `DATABASE_URL` | `postgresql://usuario:senha@ep-xxx-pooler.regiao.neon.tech/neondb?sslmode=require` |
+| `DIRECT_URL` | `postgresql://usuario:senha@ep-xxx.regiao.neon.tech/neondb?sslmode=require` |
+
+*Nota: A `DIRECT_URL` é a mesma conexão do Neon mas SEM o `-pooler` no hostname, necessária para o Prisma Migrate.*
 
 ### Deploy
 
