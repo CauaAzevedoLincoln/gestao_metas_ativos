@@ -99,8 +99,17 @@ export default function MetasTimePage() {
       data.realizado = Number(data.realizado);
       data.status = calcularStatus(data.realizado, data.meta);
       const res = await createMeta(data);
-      if (res.success) { reset(); fetchMetas(); }
-    } catch (e) { console.error(e); }
+      if (res.success) {
+        reset();
+        fetchMetas();
+        alert("Atividade salva com sucesso!");
+      } else {
+        alert("Erro ao salvar: " + (res.error || "Ocorreu um erro inesperado. Verifique as variáveis de ambiente na Vercel."));
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro crítico na aplicação. Verifique o console.");
+    }
   };
 
   const handleDeleteRow = (id: number | undefined) => {

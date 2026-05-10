@@ -1,6 +1,3 @@
-// Prisma schema - Sistema de Gestão de Metas (PostgreSQL via Neon)
-// Prisma 7: URLs de conexão ficam em prisma.config.ts, não aqui.
-
 generator client {
   provider = "prisma-client-js"
 }
