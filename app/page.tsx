@@ -21,7 +21,8 @@ import {
   Send,
   Target,
   Activity,
-  Trash2
+  Trash2,
+  Download
 } from "lucide-react";
 import { getMetas, createMeta, deleteMeta } from "./actions";
 
@@ -121,6 +122,40 @@ export default function MetasTimePage() {
       const res = await deleteMeta(id);
       if (res.success) { fetchMetas(); }
     } catch (e) { console.error(e); }
+  };
+
+  const exportToExcel = () => {
+    const csvContent = [
+      ["Status", "Analista", "Mês/Ano", "Semana", "Atividade", "Meta", "Realizado", "Justificativa"].join(","),
+      ...filteredMetas.map(item => {
+        const statusMap = {
+          "Verde": "Atingido",
+          "Amarelo": "Parcial",
+          "Vermelho": "Não Atingido"
+        };
+        const statusStr = statusMap[item.status as keyof typeof statusMap] || item.status || "-";
+        
+        return [
+          `"${statusStr}"`,
+          `"${item.analista || "-"}"`,
+          `"${item.mesAno || "-"}"`,
+          `"${item.semana || "-"}"`,
+          `"${item.atividade ? String(item.atividade).replace(/"/g, '""') : "-"}"`,
+          `"${item.meta}"`,
+          `"${item.realizado}"`,
+          `"${item.justificativa ? String(item.justificativa).replace(/"/g, '""') : "-"}"`
+        ].join(",");
+      })
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `metas_time.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const filteredMetas = useMemo(() => {
@@ -355,8 +390,15 @@ export default function MetasTimePage() {
 
             {/* Tabela */}
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-200 bg-slate-50/50">
+              <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
                 <h3 className="font-bold text-slate-900">Detalhamento das Atividades</h3>
+                <button 
+                  onClick={exportToExcel} 
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Extrair Excel
+                </button>
               </div>
               <div className="overflow-x-auto max-h-[300px] overflow-y-auto hide-scrollbar">
                 <table className="w-full text-left border-collapse min-w-[700px]">
