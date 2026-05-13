@@ -25,6 +25,8 @@ import {
   Download
 } from "lucide-react";
 import { getMetas, createMeta, deleteMeta } from "./actions";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { useTheme } from "next-themes";
 
 ChartJS.register(
   CategoryScale,
@@ -51,6 +53,10 @@ interface Meta {
 }
 
 export default function MetasTimePage() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
   const [metas, setMetas] = useState<Meta[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; idToDelete?: number }>({ isOpen: false });
@@ -204,20 +210,23 @@ export default function MetasTimePage() {
     };
   }, [filteredMetas]);
 
-  const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-slate-900";
+  const inputClass = "w-full bg-slate-50 dark:bg-[#0F0F17] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 dark:text-white";
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gradient-to-br dark:from-[#002233] dark:to-[#411E5A] transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <header className="bg-white dark:bg-transparent border-b border-slate-200 dark:border-transparent sticky top-0 z-10 transition-colors duration-200">
         <div className="max-w-[1440px] mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Gestão de Metas do Time</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Acompanhamento gerencial · Responsável: Talita</p>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Gestão de Metas do Time</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">Acompanhamento gerencial · Responsável: Talita</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-            <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
-            Sistema Standalone
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-400 bg-slate-50 dark:bg-[#1A1B26] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
+              <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
+              Sistema Standalone
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -226,15 +235,15 @@ export default function MetasTimePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Formulário */}
-          <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit">
+          <div className="lg:col-span-1 bg-white dark:bg-[#1A1B26] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm h-fit">
             <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
               <Target className="w-5 h-5 text-blue-600" />
-              <h2 className="text-base font-bold text-slate-900">Lançamento de Atividade</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Lançamento de Atividade</h2>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Analista</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Analista</label>
                 <select {...register("analista", { required: true })} className={inputClass}>
                   <option value="">Selecione...</option>
                   <option value="Cauã">Cauã</option>
@@ -246,7 +255,7 @@ export default function MetasTimePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Mês/Ano</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Mês/Ano</label>
                   <select {...register("mesAno", { required: true })} className={inputClass}>
                     <option value="">Selecione...</option>
                     {["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"].map(m => (
@@ -256,7 +265,7 @@ export default function MetasTimePage() {
                   {errors.mesAno && <span className="text-xs text-red-500">Obrigatório</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Semana</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Semana</label>
                   <select {...register("semana", { required: true })} className={inputClass}>
                     <option value="">Selecione...</option>
                     <option value="S1">S1</option>
@@ -269,26 +278,26 @@ export default function MetasTimePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Atividade</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Atividade</label>
                 <input type="text" placeholder="Ex: Atualização de Relatórios..." {...register("atividade", { required: true })} className={inputClass} />
                 {errors.atividade && <span className="text-xs text-red-500">Obrigatório</span>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Meta</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Meta</label>
                   <input type="number" placeholder="0" {...register("meta", { required: true, min: 0 })} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Realizado</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Realizado</label>
                   <input type="number" placeholder="0" {...register("realizado", { required: true, min: 0 })} className={inputClass} />
                 </div>
               </div>
 
               <div className={`p-3 rounded-xl border flex items-center justify-between text-sm font-medium ${
-                currentStatus === "Verde"   ? "bg-green-50  border-green-200  text-green-700"  :
-                currentStatus === "Amarelo" ? "bg-yellow-50 border-yellow-200 text-yellow-700" :
-                                              "bg-red-50    border-red-200    text-red-700"
+                currentStatus === "Verde"   ? "bg-green-50 dark:bg-[#10b981]/10 border-green-200 dark:border-[#10b981]/30 text-green-700 dark:text-[#10b981]"  :
+                currentStatus === "Amarelo" ? "bg-yellow-50 dark:bg-[#f59e0b]/10 border-yellow-200 dark:border-[#f59e0b]/30 text-yellow-700 dark:text-[#f59e0b]" :
+                                              "bg-red-50 dark:bg-[#ef4444]/10 border-red-200 dark:border-[#ef4444]/30 text-red-700 dark:text-[#ef4444]"
               }`}>
                 <span>Status Estimado:</span>
                 <span className="flex items-center gap-1">
@@ -300,7 +309,7 @@ export default function MetasTimePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                   Observação/Justificativa {isJustificativaRequired && <span className="text-red-500">*</span>}
                 </label>
                 <textarea
@@ -322,8 +331,8 @@ export default function MetasTimePage() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Filtros */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
-              <div className="flex items-center gap-2 text-slate-500">
+            <div className="bg-white dark:bg-[#1A1B26] border border-slate-200 dark:border-white/5 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-300">
                 <Filter className="w-4 h-4" />
                 <span className="text-sm font-medium">Filtros:</span>
               </div>
@@ -333,7 +342,7 @@ export default function MetasTimePage() {
                 { value: filtroSemana,   onChange: setFiltroSemana,   options: [["Todas","Todas Semanas"],["S1","S1"],["S2","S2"],["S3","S3"],["S4","S4"]] },
               ].map((sel, i) => (
                 <select key={i} value={sel.value} onChange={e => sel.onChange(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none text-slate-900 min-w-[140px]">
+                  className="bg-slate-50 dark:bg-[#0F0F17] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm outline-none text-slate-900 dark:text-slate-100 min-w-[140px]">
                   {sel.options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               ))}
@@ -341,27 +350,27 @@ export default function MetasTimePage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="text-sm font-semibold text-slate-500 mb-2 flex justify-between items-center">
+              <div className="bg-white dark:bg-[#1A1B26] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                <div className="text-sm font-semibold text-slate-500 dark:text-slate-300 mb-2 flex justify-between items-center">
                   Total de Atividades
-                  <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Activity className="w-5 h-5"/></div>
+                  <div className="p-2 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl"><Activity className="w-5 h-5"/></div>
                 </div>
-                <div className="text-3xl font-bold text-slate-900">{loading ? "…" : stats.total}</div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">{loading ? "…" : stats.total}</div>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="text-sm font-semibold text-slate-500 mb-2 flex justify-between items-center">
+              <div className="bg-white dark:bg-[#1A1B26] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                <div className="text-sm font-semibold text-slate-500 dark:text-slate-300 mb-2 flex justify-between items-center">
                   Atingimento Geral
-                  <div className="p-2 bg-green-50 text-green-600 rounded-xl"><Target className="w-5 h-5"/></div>
+                  <div className="p-2 bg-green-50 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl"><Target className="w-5 h-5"/></div>
                 </div>
                 <div className="text-3xl font-bold text-green-600">{loading ? "…" : `${stats.percent}%`}</div>
                 <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
                   <div className="bg-green-500 h-full rounded-full transition-all" style={{ width: `${stats.percent}%` }} />
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
-                <div className="text-sm font-semibold text-slate-500 mb-2 flex justify-between items-center">
+              <div className="bg-white dark:bg-[#1A1B26] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm border-l-4 border-l-red-500">
+                <div className="text-sm font-semibold text-slate-500 dark:text-slate-300 mb-2 flex justify-between items-center">
                   Alerta Vermelho
-                  <div className="p-2 bg-red-50 text-red-500 rounded-xl"><AlertTriangle className="w-5 h-5"/></div>
+                  <div className="p-2 bg-red-50 dark:bg-red-500/20 text-red-500 dark:text-red-400 rounded-xl"><AlertTriangle className="w-5 h-5"/></div>
                 </div>
                 <div className="text-3xl font-bold text-red-500">{loading ? "…" : stats.countVermelho}</div>
                 <div className="text-xs text-slate-400 mt-2 font-medium">atividades zeradas</div>
@@ -370,28 +379,28 @@ export default function MetasTimePage() {
 
             {/* Gráficos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-slate-800 mb-6">Atividades por Analista</h3>
+              <div className="bg-white dark:bg-[#1A1B26] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-6">Atividades por Analista</h3>
                 <div className="h-[250px] flex items-center justify-center">
                   {stats.total > 0 ? (
-                    <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, border: { display: false } } }, plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6 } } } }} />
+                    <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false }, ticks: { color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)" } }, y: { display: false, stacked: true, beginAtZero: true, border: { display: false }, grid: { color: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }, ticks: { color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)" } } }, plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)" } } } }} />
                   ) : <span className="text-slate-400 text-sm">Sem dados</span>}
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-slate-800 mb-6">Distribuição de Status</h3>
+              <div className="bg-white dark:bg-[#1A1B26] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-6">Distribuição de Status</h3>
                 <div className="h-[250px] flex items-center justify-center">
                   {stats.total > 0 ? (
-                    <Doughnut data={donutData} options={{ responsive: true, maintainAspectRatio: false, cutout: "70%", plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6 } } } }} />
+                    <Doughnut data={donutData} options={{ responsive: true, maintainAspectRatio: false, cutout: "70%", plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)" } } } }} />
                   ) : <span className="text-slate-400 text-sm">Sem dados</span>}
                 </div>
               </div>
             </div>
 
             {/* Tabela */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
-                <h3 className="font-bold text-slate-900">Detalhamento das Atividades</h3>
+            <div className="bg-white dark:bg-[#1A1B26] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-slate-200 bg-slate-50/50 dark:bg-[#002233]/50 flex justify-between items-center">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100">Detalhamento das Atividades</h3>
                 <button 
                   onClick={exportToExcel} 
                   className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
@@ -402,16 +411,16 @@ export default function MetasTimePage() {
               </div>
               <div className="overflow-x-auto max-h-[300px] overflow-y-auto hide-scrollbar">
                 <table className="w-full text-left border-collapse min-w-[700px]">
-                  <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
+                  <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#002233] border-b border-slate-200 dark:border-[#411E5A]/30">
                     <tr>
                       {["Status","Analista","Mês/Ano","Semana","Atividade","M / R","Justificativa","Ações"].map(h => (
-                        <th key={h} className={`px-4 py-3 text-xs font-semibold text-slate-500 uppercase ${h === "M / R" || h === "Ações" ? "text-right" : ""}`}>{h}</th>
+                        <th key={h} className={`px-4 py-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase ${h === "M / R" || h === "Ações" ? "text-right" : ""}`}>{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-[#411E5A]/20">
                     {filteredMetas.length > 0 ? filteredMetas.map((item, idx) => (
-                      <tr key={item.id || idx} className="hover:bg-slate-50 text-sm">
+                      <tr key={item.id || idx} className="hover:bg-slate-50 dark:hover:bg-[#002233] text-sm">
                         <td className="px-4 py-3">
                           <div className={`inline-flex p-1.5 rounded-full ${
                             item.status === "Verde"   ? "bg-green-100  text-green-600"  :
@@ -423,12 +432,12 @@ export default function MetasTimePage() {
                             {item.status === "Vermelho" && <XCircle      className="w-4 h-4" />}
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-medium text-slate-900">{item.analista}</td>
-                        <td className="px-4 py-3 text-slate-600">{item.mesAno || "-"}</td>
-                        <td className="px-4 py-3 text-slate-600">{item.semana}</td>
-                        <td className="px-4 py-3 text-slate-600 max-w-[200px] truncate" title={item.atividade}>{item.atividade}</td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-600">{item.meta} / {item.realizado}</td>
-                        <td className="px-4 py-3 text-slate-500 text-xs max-w-[250px] truncate" title={item.justificativa}>{item.justificativa || "-"}</td>
+                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{item.analista}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{item.mesAno || "-"}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{item.semana}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[200px] truncate" title={item.atividade}>{item.atividade}</td>
+                        <td className="px-4 py-3 text-right font-mono text-slate-600 dark:text-slate-300">{item.meta} / {item.realizado}</td>
+                        <td className="px-4 py-3 text-slate-500 dark:text-slate-300 text-xs max-w-[250px] truncate" title={item.justificativa}>{item.justificativa || "-"}</td>
                         <td className="px-4 py-3 text-right">
                           <button onClick={() => handleDeleteRow(item.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
                             <Trash2 className="w-4 h-4" />
@@ -437,7 +446,7 @@ export default function MetasTimePage() {
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
+                        <td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-300">
                           {loading ? "Carregando..." : "Nenhuma atividade encontrada"}
                         </td>
                       </tr>
@@ -453,15 +462,15 @@ export default function MetasTimePage() {
       {/* Modal de Confirmação */}
       {confirmModal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-white dark:bg-[#1A1B26] border border-slate-200 dark:border-white/5 rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-2">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Excluir atividade?</h3>
-              <p className="text-slate-500 text-sm">Tem certeza que deseja excluir este registro permanentemente? Esta ação não poderá ser desfeita.</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Excluir atividade?</h3>
+              <p className="text-slate-500 dark:text-slate-300 text-sm">Tem certeza que deseja excluir este registro permanentemente? Esta ação não poderá ser desfeita.</p>
               <div className="flex gap-3 w-full mt-4">
-                <button onClick={() => setConfirmModal({ isOpen: false })} className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors">
+                <button onClick={() => setConfirmModal({ isOpen: false })} className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:text-slate-900 rounded-xl font-medium transition-colors">
                   Cancelar
                 </button>
                 <button onClick={executeDeleteRow} className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors">
